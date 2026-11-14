@@ -270,6 +270,7 @@
     "gamepad_driver_none": "Nessuno (disabilita gamepads)",
     "gamepad_driver_select": "Scegli un autista...",
     "gamepad_driver_vigembus": "ViGEmBus",
+    "gamepad_driver_osmspad": "OsmsPad (OpenStreamMS)",
     "gamepad_driver_virtualhid": "Driver Hid Virtuale",
     "gamepad_ds4": "DS4 (PS4)",
     "gamepad_ds4_manual": "Opzioni del DS4",

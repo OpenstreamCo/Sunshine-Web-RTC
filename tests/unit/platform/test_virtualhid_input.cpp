@@ -241,6 +241,7 @@ TEST_F(VirtualHidDeviceTest, SelectsVirtualHidGamepadRuntimeByBackendLicenseAndP
   EXPECT_TRUE(platf::virtualhid::should_use_gamepad_runtime(capabilities, config::GAMEPAD_DRIVER_ALL, true));
   EXPECT_TRUE(platf::virtualhid::should_use_gamepad_runtime(capabilities, config::GAMEPAD_DRIVER_VIRTUALHID, true));
   EXPECT_FALSE(platf::virtualhid::should_use_gamepad_runtime(capabilities, config::GAMEPAD_DRIVER_VIGEMBUS, true));
+  EXPECT_FALSE(platf::virtualhid::should_use_gamepad_runtime(capabilities, config::GAMEPAD_DRIVER_OSMSPAD, true));
   EXPECT_FALSE(platf::virtualhid::should_use_gamepad_runtime(capabilities, config::GAMEPAD_DRIVER_NONE, true));
 
   capabilities.supports_gamepad = false;

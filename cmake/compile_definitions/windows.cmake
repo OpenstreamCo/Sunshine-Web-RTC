@@ -67,6 +67,9 @@ set(PLATFORM_TARGET_FILES
         "${CMAKE_SOURCE_DIR}/src/platform/windows/misc.h"
         "${CMAKE_SOURCE_DIR}/src/platform/windows/misc.cpp"
         "${CMAKE_SOURCE_DIR}/src/platform/windows/input.cpp"
+        "${CMAKE_SOURCE_DIR}/src/platform/windows/osmspad.h"
+        "${CMAKE_SOURCE_DIR}/src/platform/windows/osmspad.cpp"
+        "${CMAKE_SOURCE_DIR}/src/platform/windows/osmspad_ioctl.h"
         "${CMAKE_SOURCE_DIR}/src/platform/windows/session_input.h"
         "${CMAKE_SOURCE_DIR}/src/platform/windows/session_input.cpp"
         "${CMAKE_SOURCE_DIR}/src/platform/windows/display.h"
@@ -95,6 +98,7 @@ set(OPENSSL_LIBRARIES
 list(PREPEND PLATFORM_LIBRARIES
         ${CURL_STATIC_LIBRARIES}
         avrt
+        cfgmgr32
         d3d11
         D3DCompiler
         dwmapi

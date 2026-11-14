@@ -29,6 +29,7 @@
 // local includes
 #include "input.h"
 #include "misc.h"
+#include "osmspad.h"
 #include "src/config.h"
 #include "src/globals.h"
 #include "src/logging.h"
@@ -522,7 +523,26 @@ namespace platf {
   struct input_raw_t {
     virtualhid::input_context_t virtualhid;  ///< libvirtualhid input context.
     std::unique_ptr<vigem_t> vigem;  ///< ViGEm fallback context.
+    std::unique_ptr<osmspad_t> osmspad;  ///< OsmsPad driver context, when gamepad_driver = osmspad.
   };
+
+  /**
+   * @brief Open the OsmsPad driver if it is not already open.
+   *
+   * @param raw Platform input context.
+   * @return True when OsmsPad can create controllers.
+   */
+  bool ensure_osmspad(input_raw_t *raw) {
+    if (raw->osmspad) {
+      return true;
+    }
+    auto osmspad = std::make_unique<osmspad_t>();
+    if (!osmspad->init()) {
+      return false;
+    }
+    raw->osmspad = std::move(osmspad);
+    return true;
+  }
 
   /**
    * @brief Check whether the libvirtualhid runtime should receive gamepad allocations.
@@ -671,6 +691,18 @@ namespace platf {
       return 0;
     }
 
+    // OsmsPad (OpenStreamMS): every controller is an Xbox Series pad on the XInput path. If the
+    // driver is not installed, fall back to ViGEmBus with the usual type selection.
+    if (config::input.gamepad_driver == config::GAMEPAD_DRIVER_OSMSPAD) {
+      if (ensure_osmspad(raw)) {
+        BOOST_LOG(info) << "Gamepad " << id.globalIndex << " will be Xbox Series controller (OsmsPad)"sv;
+        if (raw->osmspad->alloc(id, feedback_queue) == 0) {
+          return 0;
+        }
+      }
+      BOOST_LOG(warning) << "OsmsPad is unavailable; using ViGEmBus for gamepad "sv << id.globalIndex;
+    }
+
     if (!should_allocate_vigembus_gamepad(use_virtualhid)) {
       return -1;
     }
@@ -729,6 +761,10 @@ namespace platf {
   int rebind_gamepad(input_t &input, const gamepad_id_t &id, feedback_queue_t feedback_queue) {
     auto raw = (input_raw_t *) input.get();
 
+    if (raw->osmspad && raw->osmspad->has(id.globalIndex)) {
+      return raw->osmspad->rebind(id, std::move(feedback_queue));
+    }
+
     if (virtualhid::has_gamepad(raw->virtualhid, id.globalIndex)) {
       return virtualhid::rebind_gamepad(raw->virtualhid, id, std::move(feedback_queue));
     }
@@ -742,6 +778,11 @@ namespace platf {
 
   void free_gamepad(input_t &input, int nr) {
     auto raw = (input_raw_t *) input.get();
+
+    if (raw->osmspad && raw->osmspad->has(nr)) {
+      raw->osmspad->free(nr);
+      return;
+    }
 
     if (virtualhid::has_gamepad(raw->virtualhid, nr)) {
       virtualhid::free_gamepad(raw->virtualhid, nr);
@@ -1006,6 +1047,10 @@ namespace platf {
    */
   void gamepad_update(input_t &input, int nr, const gamepad_state_t &gamepad_state) {
     auto raw = (input_raw_t *) input.get();
+    if (raw->osmspad && raw->osmspad->has(nr)) {
+      raw->osmspad->update(nr, gamepad_state);
+      return;
+    }
     if (virtualhid::has_gamepad(raw->virtualhid, nr)) {
       virtualhid::gamepad_update(raw->virtualhid, nr, gamepad_state);
       return;

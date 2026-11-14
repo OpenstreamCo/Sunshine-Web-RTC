@@ -270,6 +270,7 @@
     "gamepad_driver_none": "Không có (tắt bộ điều khiển trò chơi)",
     "gamepad_driver_select": "Chọn một trình điều khiển...",
     "gamepad_driver_vigembus": "ViGEmBus",
+    "gamepad_driver_osmspad": "OsmsPad (OpenStreamMS)",
     "gamepad_driver_virtualhid": "Trình điều khiển HID ảo",
     "gamepad_ds4": "DS4 (PlayStation 4)",
     "gamepad_ds4_manual": "Các tùy chọn lựa chọn cho DS4",

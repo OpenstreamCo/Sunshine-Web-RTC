@@ -270,6 +270,7 @@
     "gamepad_driver_none": "無（停用遊戲手把）",
     "gamepad_driver_select": "選擇一個驅動程式...",
     "gamepad_driver_vigembus": "ViGEmBus",
+    "gamepad_driver_osmspad": "OsmsPad (OpenStreamMS)",
     "gamepad_driver_virtualhid": "虛擬 HID 驅動程式",
     "gamepad_ds4": "DS4 (PS4)",
     "gamepad_ds4_manual": "DS4 選擇選項",

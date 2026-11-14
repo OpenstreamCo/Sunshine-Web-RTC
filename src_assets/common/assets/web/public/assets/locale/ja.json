@@ -270,6 +270,7 @@
     "gamepad_driver_none": "なし (ゲームパッドを無効にする)",
     "gamepad_driver_select": "ドライバを選択してください...",
     "gamepad_driver_vigembus": "ViGEmBus",
+    "gamepad_driver_osmspad": "OsmsPad (OpenStreamMS)",
     "gamepad_driver_virtualhid": "バーチャルHIDドライバ",
     "gamepad_ds4": "DS4 (PS4)",
     "gamepad_ds4_manual": "DS4選択オプション",

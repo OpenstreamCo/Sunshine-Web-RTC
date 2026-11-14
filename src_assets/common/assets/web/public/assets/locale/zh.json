@@ -270,6 +270,7 @@
     "gamepad_driver_none": "无（禁用游戏手柄）",
     "gamepad_driver_select": "选择一个驱动程序...",
     "gamepad_driver_vigembus": "ViGEmBus",
+    "gamepad_driver_osmspad": "OsmsPad (OpenStreamMS)",
     "gamepad_driver_virtualhid": "Virtual HID Driver",
     "gamepad_ds4": "DS4 (PS4)",
     "gamepad_ds4_manual": "DS4选择选项",

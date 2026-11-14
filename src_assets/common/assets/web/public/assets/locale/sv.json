@@ -270,6 +270,7 @@
     "gamepad_driver_none": "Ingen (inaktivera gamepads)",
     "gamepad_driver_select": "Välj en drivrutin...",
     "gamepad_driver_vigembus": "ViGEmBus",
+    "gamepad_driver_osmspad": "OsmsPad (OpenStreamMS)",
     "gamepad_driver_virtualhid": "Virtuell HID drivrutin",
     "gamepad_ds4": "DS4 (PS4)",
     "gamepad_ds4_manual": "DS4 val alternativ",

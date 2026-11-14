@@ -131,6 +131,7 @@ watch(
         <option v-if="platform === 'windows'" value="all">{{ $t('config.gamepad_driver_all') }}</option>
         <option value="virtualhid">{{ $t('config.gamepad_driver_virtualhid') }}</option>
         <option v-if="platform === 'windows'" value="vigembus">{{ $t('config.gamepad_driver_vigembus') }}</option>
+        <option v-if="platform === 'windows'" value="osmspad">{{ $t('config.gamepad_driver_osmspad') }}</option>
         <option value="none">{{ $t('config.gamepad_driver_none') }}</option>
       </select>
       <div class="form-text">{{ $t(platform === 'macos' ? 'config.gamepad_driver_macos_desc' : 'config.gamepad_driver_desc') }}</div>
