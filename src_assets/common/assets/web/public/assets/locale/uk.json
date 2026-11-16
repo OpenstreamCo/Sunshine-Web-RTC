@@ -270,6 +270,7 @@
     "gamepad_driver_none": "Нічого (вимкнути геймпеди)",
     "gamepad_driver_select": "Виберіть драйвер...",
     "gamepad_driver_vigembus": "Вігембус",
+    "gamepad_driver_osmspad": "OsmsPad (OpenStreamMS)",
     "gamepad_driver_virtualhid": "Віртуальний HID драйвер",
     "gamepad_ds4": "DS4 (PS4)",
     "gamepad_ds4_manual": "Опції DS4",

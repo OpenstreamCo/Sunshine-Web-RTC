@@ -270,6 +270,7 @@
     "gamepad_driver_none": "Žádný (zakázat gamepady)",
     "gamepad_driver_select": "Vyberte si backend...",
     "gamepad_driver_vigembus": "ViGEmbus",
+    "gamepad_driver_osmspad": "OsmsPad (OpenStreamMS)",
     "gamepad_driver_virtualhid": "Virtuální HID Broker",
     "gamepad_ds4": "DS4 (PS4)",
     "gamepad_ds4_manual": "Možnosti herních ovladačů ve stylu PlayStation",

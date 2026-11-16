@@ -270,6 +270,7 @@
     "gamepad_driver_none": "Aucun (désactiver les manettes)",
     "gamepad_driver_select": "Choisir un backend…",
     "gamepad_driver_vigembus": "ViGEmBus",
+    "gamepad_driver_osmspad": "OsmsPad (OpenStreamMS)",
     "gamepad_driver_virtualhid": "Pilote HID virtuel",
     "gamepad_ds4": "DS4 (PS4)",
     "gamepad_ds4_manual": "Options de sélection DS4",

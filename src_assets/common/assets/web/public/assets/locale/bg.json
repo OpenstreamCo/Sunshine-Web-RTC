@@ -270,6 +270,7 @@
     "gamepad_driver_none": "Нищо (изключване на контролерите)",
     "gamepad_driver_select": "Избор на драйвер…",
     "gamepad_driver_vigembus": "ViGEmBus",
+    "gamepad_driver_osmspad": "OsmsPad (OpenStreamMS)",
     "gamepad_driver_virtualhid": "Virtual HID Broker",
     "gamepad_ds4": "DS4 (PS4)",
     "gamepad_ds4_manual": "Настройки за контролери от типа на PlayStation",

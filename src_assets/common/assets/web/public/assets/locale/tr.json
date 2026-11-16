@@ -270,6 +270,7 @@
     "gamepad_driver_none": "Yok (oyun kumandalarını devre dışı bırak)",
     "gamepad_driver_select": "Bir sürücü seçin...",
     "gamepad_driver_vigembus": "ViGEmBus",
+    "gamepad_driver_osmspad": "OsmsPad (OpenStreamMS)",
     "gamepad_driver_virtualhid": "Sanal HID Sürücüsü",
     "gamepad_ds4": "DS4 (PS4)",
     "gamepad_ds4_manual": "DS4 seçim seçenekleri",

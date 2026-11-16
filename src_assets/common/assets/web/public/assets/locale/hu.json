@@ -270,6 +270,7 @@
     "gamepad_driver_none": "Nincs (a játékvezérlők letiltása)",
     "gamepad_driver_select": "Válasszon meghajtót...",
     "gamepad_driver_vigembus": "ViGEmBus",
+    "gamepad_driver_osmspad": "OsmsPad (OpenStreamMS)",
     "gamepad_driver_virtualhid": "Virtuális HID-illesztőprogram",
     "gamepad_ds4": "DS4 (PS4)",
     "gamepad_ds4_manual": "DS4 választási beállítások",

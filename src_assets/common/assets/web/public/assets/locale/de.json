@@ -270,6 +270,7 @@
     "gamepad_driver_none": "Keine (Gamepads deaktivieren)",
     "gamepad_driver_select": "Wähle einen Treiber...",
     "gamepad_driver_vigembus": "ViGEmBus",
+    "gamepad_driver_osmspad": "OsmsPad (OpenStreamMS)",
     "gamepad_driver_virtualhid": "Virtueller HID-Treiber",
     "gamepad_ds4": "DS4 (PS4)",
     "gamepad_ds4_manual": "DS4 Auswahloptionen",

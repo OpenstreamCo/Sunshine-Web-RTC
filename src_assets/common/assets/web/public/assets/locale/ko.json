@@ -270,6 +270,7 @@
     "gamepad_driver_none": "없음 (게임패드 비활성화)",
     "gamepad_driver_select": "드라이버를 선택하세요...",
     "gamepad_driver_vigembus": "ViGEmBus",
+    "gamepad_driver_osmspad": "OsmsPad (OpenStreamMS)",
     "gamepad_driver_virtualhid": "가상 HID 드라이버",
     "gamepad_ds4": "DS4 (PS4)",
     "gamepad_ds4_manual": "DS4 선택 옵션",
