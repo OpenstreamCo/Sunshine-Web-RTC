@@ -47,6 +47,8 @@ modules:
   - "modules/libevdev.json"
   - "modules/miniupnpc.json"
   - "modules/numactl.json"
+  # WebRTC transport; flatpak-builder has no network, so CMake's FetchContent fallback cannot be used here
+  - "modules/libdatachannel.json"
 
   # Caching is configured until here, not including CUDA, since it is too large for GitHub cache
   - "modules/cuda.json"
