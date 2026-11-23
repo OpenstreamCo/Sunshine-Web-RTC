@@ -7,6 +7,7 @@
 // standard includes
 #include <chrono>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -874,9 +875,28 @@ namespace platf::dxgi {
    * @brief A session of a mosaic stream, as listed in osms-mosaic.txt.
    */
   struct mosaic_entry_t {
-    uint32_t session;  ///< Terminal Services session id.
+    uint32_t session;  ///< Terminal Services session id; 0 while the session is (re)starting.
     int cells;  ///< Cells of the 2x2 grid it covers: 1 top-left, 2 top-right, 4 bottom-left, 8 bottom-right.
+    std::string waiting;  ///< Image shown while the session publishes no frames (see read_waiting_image); empty = black.
   };
+
+  /**
+   * @brief Image that OpenStreamMS draws for a part whose session is (re)starting.
+   */
+  struct waiting_image_t {
+    int width = 0;  ///< Width in pixels.
+    int height = 0;  ///< Height in pixels.
+    std::vector<uint8_t> bgra;  ///< Pixels, BGRA, top to bottom, width * 4 bytes per row.
+  };
+
+  /**
+   * @brief Read a waiting image: "OSWP", width and height as little-endian int32, then the
+   * BGRA pixels.
+   *
+   * @param bytes File content.
+   * @return The image, or nullopt when the content is not a valid image.
+   */
+  std::optional<waiting_image_t> parse_waiting_image(const std::string &bytes);
 
   /**
    * @brief Content of osms-mosaic.txt.
@@ -909,8 +929,9 @@ namespace platf::dxgi {
   /**
    * @brief Parse osms-mosaic.txt.
    *
-   * Lines are "canvas <width> <height>" or "<session id> <part>"; lines starting with #
-   * are comments. Lines that do not parse, and parts that overlap an earlier one, are skipped.
+   * Lines are "canvas <width> <height>" or "<session id> <part> [<waiting image path>]";
+   * lines starting with # are comments. Session 0 keeps the part while its session is
+   * (re)starting. Lines that do not parse, and parts that overlap an earlier one, are skipped.
    *
    * @param text File content.
    * @return Parsed layout.
@@ -995,6 +1016,8 @@ namespace platf::dxgi {
       uint32_t frame_width = 0;  ///< Size of the last frame copied, to notice a shrink.
       uint32_t frame_height = 0;  ///< Size of the last frame copied, to notice a shrink.
       std::chrono::steady_clock::time_point next_open;  ///< When to retry opening the slot.
+      texture2d_t waiting;  ///< Image shown until the session publishes a frame; null = black.
+      bool showing_waiting = false;  ///< The waiting image is on the canvas.
     };
 
     /**
@@ -1012,6 +1035,17 @@ namespace platf::dxgi {
      * @brief Clear the canvas to black and copy every tile again on the next snapshot.
      */
     void clear_canvas();
+    /**
+     * @brief Load the waiting image of a tile into a texture; on failure the tile stays black.
+     * @param tile Tile.
+     * @param path Image file written by OpenStreamMS.
+     */
+    void load_waiting(mosaic_tile_t &tile, const std::string &path);
+    /**
+     * @brief Copy the waiting image of a tile onto its part of the canvas.
+     * @param tile Tile with a waiting image.
+     */
+    void draw_waiting(mosaic_tile_t &tile);
     /**
      * @brief Snapshot in mosaic mode: copy the tiles that changed and then the canvas.
      */

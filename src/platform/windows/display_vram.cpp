@@ -1999,7 +1999,7 @@ namespace platf::dxgi {
     std::vector<HANDLE> events;
     events.reserve(tiles.size());
     for (auto &tile : tiles) {
-      if (!tile.consumer && now >= tile.next_open) {
+      if (!tile.consumer && tile.session && now >= tile.next_open) {
         open_tile(tile);
       }
       if (tile.consumer) {
@@ -2035,6 +2035,11 @@ namespace platf::dxgi {
     uint64_t newest_qpc = 0;
     for (auto &tile : tiles) {
       if (!tile.consumer) {
+        // Session (re)starting: its waiting image until it publishes again.
+        if (tile.waiting && !tile.showing_waiting) {
+          draw_waiting(tile);
+          updated = true;
+        }
         continue;
       }
       auto id = tile.consumer->LatestFrameId();
@@ -2072,6 +2077,7 @@ namespace platf::dxgi {
       // is cropped to its part rather than scaled.
       D3D11_BOX box {0, 0, 0, std::min<UINT>(frame.Width, tile.width), std::min<UINT>(frame.Height, tile.height), 1};
       device_ctx->CopySubresourceRegion(canvas.get(), 0, tile.x, tile.y, 0, src.get(), 0, &box);
+      tile.showing_waiting = false;
       tile.last_frame = frame.FrameId;
       newest_qpc = std::max<uint64_t>(newest_qpc, frame.QpcPresent);
       updated = true;

@@ -376,6 +376,46 @@ TEST(RemoteIddMosaicLayoutTest, ParsesCanvasSessionsAndSkipsBadLines) {
 }
 
 /**
+ * @brief A part keeps its place with session 0 while its session restarts, with the waiting
+ * image path (spaces included) after the part name.
+ */
+TEST(RemoteIddMosaicLayoutTest, ParsesWaitingImageAndSessionZero) {
+  auto layout = platf::dxgi::parse_mosaic_layout(
+    "canvas 3840 2160\n"
+    "7 Top C:\\Program Files\\OpenStreamMS\\sessions\\x\\osms-wait-0.bgra\n"
+    "0 Bottom   C:\\wait 1.bgra\r\n"
+    "9 TopLeft\n"  // overlaps 7
+  );
+  ASSERT_EQ(layout.entries.size(), 2u);
+  EXPECT_EQ(layout.entries[0].session, 7u);
+  EXPECT_EQ(layout.entries[0].waiting, "C:\\Program Files\\OpenStreamMS\\sessions\\x\\osms-wait-0.bgra");
+  EXPECT_EQ(layout.entries[1].session, 0u);
+  EXPECT_EQ(layout.entries[1].cells, 0b1100);
+  EXPECT_EQ(layout.entries[1].waiting, "C:\\wait 1.bgra");
+  EXPECT_TRUE(platf::dxgi::parse_mosaic_layout("7 Top\n").entries[0].waiting.empty());
+}
+
+/**
+ * @brief A waiting image is "OSWP", width, height and exactly width * height BGRA pixels.
+ */
+TEST(RemoteIddMosaicLayoutTest, ParsesWaitingImage) {
+  std::string ok = "OSWP";
+  ok += std::string("\x02\x00\x00\x00\x01\x00\x00\x00", 8);
+  ok += std::string("\x01\x02\x03\x04\x05\x06\x07\x08", 8);
+  auto image = platf::dxgi::parse_waiting_image(ok);
+  ASSERT_TRUE(image.has_value());
+  EXPECT_EQ(image->width, 2);
+  EXPECT_EQ(image->height, 1);
+  ASSERT_EQ(image->bgra.size(), 8u);
+  EXPECT_EQ(image->bgra[7], 8);
+
+  EXPECT_FALSE(platf::dxgi::parse_waiting_image(ok.substr(0, ok.size() - 1)).has_value());  // short
+  EXPECT_FALSE(platf::dxgi::parse_waiting_image("OSWX" + ok.substr(4)).has_value());  // magic
+  EXPECT_FALSE(platf::dxgi::parse_waiting_image("OSWP" + std::string(8, '\0')).has_value());  // 0x0
+  EXPECT_FALSE(platf::dxgi::parse_waiting_image("").has_value());
+}
+
+/**
  * @brief Without a valid canvas line the canvas is left to the stream size.
  */
 TEST(RemoteIddMosaicLayoutTest, IgnoresInvalidCanvas) {

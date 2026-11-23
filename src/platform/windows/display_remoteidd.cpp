@@ -134,6 +134,10 @@ namespace platf::dxgi {
         }
         continue;
       }
+      // Rest of the line: the waiting image path (it may contain spaces).
+      std::string waiting;
+      std::getline(fields, waiting);
+      waiting.erase(0, waiting.find_first_not_of(" \t"));
       uint32_t session = 0;
       auto [end, ec] = std::from_chars(first.data(), first.data() + first.size(), session);
       int cells = mosaic_area_cells(second);
@@ -142,9 +146,26 @@ namespace platf::dxgi {
         continue;
       }
       used |= cells;
-      layout.entries.push_back({session, cells});
+      layout.entries.push_back({session, cells, std::move(waiting)});
     }
     return layout;
+  }
+
+  std::optional<waiting_image_t> parse_waiting_image(const std::string &bytes) {
+    if (bytes.size() < 12 || bytes.compare(0, 4, "OSWP") != 0) {
+      return std::nullopt;
+    }
+    auto read_int = [&](size_t at) {
+      return static_cast<int32_t>(static_cast<uint8_t>(bytes[at]) | (static_cast<uint8_t>(bytes[at + 1]) << 8) | (static_cast<uint8_t>(bytes[at + 2]) << 16) | (static_cast<uint32_t>(static_cast<uint8_t>(bytes[at + 3])) << 24));
+    };
+    waiting_image_t image;
+    image.width = read_int(4);
+    image.height = read_int(8);
+    if (image.width <= 0 || image.height <= 0 || image.width > 16384 || image.height > 16384 || bytes.size() != 12 + static_cast<size_t>(image.width) * image.height * 4) {
+      return std::nullopt;
+    }
+    image.bgra.assign(bytes.begin() + 12, bytes.end());
+    return image;
   }
 
   mosaic_rect_t mosaic_rect(int cells, int canvas_width, int canvas_height) {
@@ -218,6 +239,9 @@ namespace platf::dxgi {
       tile.y = rect.y;
       tile.width = rect.width;
       tile.height = rect.height;
+      if (!e.waiting.empty()) {
+        load_waiting(tile, e.waiting);
+      }
 
       if (e.session == session) {
         // Absolute mouse: the client points at the canvas, the desktop is this tile.
@@ -255,7 +279,9 @@ namespace platf::dxgi {
     clear_canvas();
 
     for (auto &tile : tiles) {
-      open_tile(tile);
+      if (tile.session) {
+        open_tile(tile);
+      }
     }
     BOOST_LOG(info) << "RemoteIdd mosaic: "sv << tiles.size() << " sessions on a "sv << canvas_w << 'x' << canvas_h << " canvas"sv;
     return 0;
@@ -294,7 +320,50 @@ namespace platf::dxgi {
     device_ctx->ClearRenderTargetView(canvas_rt.get(), black);
     for (auto &tile : tiles) {
       tile.last_frame = 0;
+      tile.showing_waiting = false;
     }
     compose_now = true;
+  }
+
+  void display_ridd_vram_t::load_waiting(mosaic_tile_t &tile, const std::string &path) {
+    std::ifstream file(std::filesystem::path(reinterpret_cast<const char8_t *>(path.c_str())), std::ios::binary);
+    std::ostringstream content;
+    if (file) {
+      content << file.rdbuf();
+    }
+    auto image = parse_waiting_image(content.str());
+    if (!image) {
+      BOOST_LOG(warning) << "RemoteIdd mosaic: no valid waiting image at "sv << path;
+      return;
+    }
+    D3D11_TEXTURE2D_DESC desc {};
+    desc.Width = image->width;
+    desc.Height = image->height;
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.Usage = D3D11_USAGE_IMMUTABLE;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    D3D11_SUBRESOURCE_DATA data {image->bgra.data(), static_cast<UINT>(image->width * 4), 0};
+    ID3D11Texture2D *raw = nullptr;
+    if (FAILED(device->CreateTexture2D(&desc, &data, &raw))) {
+      BOOST_LOG(warning) << "RemoteIdd mosaic: failed to create the waiting image texture"sv;
+      return;
+    }
+    tile.waiting.reset(raw);
+  }
+
+  void display_ridd_vram_t::draw_waiting(mosaic_tile_t &tile) {
+    D3D11_TEXTURE2D_DESC desc;
+    tile.waiting->GetDesc(&desc);
+    // Same size as the part (OpenStreamMS draws it so); otherwise centred and cropped.
+    const auto w = std::min<UINT>(desc.Width, tile.width);
+    const auto h = std::min<UINT>(desc.Height, tile.height);
+    const auto sx = (desc.Width - w) / 2;
+    const auto sy = (desc.Height - h) / 2;
+    D3D11_BOX box {sx, sy, 0, sx + w, sy + h, 1};
+    device_ctx->CopySubresourceRegion(canvas.get(), 0, tile.x + (tile.width - static_cast<int>(w)) / 2, tile.y + (tile.height - static_cast<int>(h)) / 2, 0, tile.waiting.get(), 0, &box);
+    tile.showing_waiting = true;
   }
 }  // namespace platf::dxgi
