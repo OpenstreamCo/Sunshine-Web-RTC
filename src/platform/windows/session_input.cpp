@@ -20,12 +20,14 @@
 // platform includes
 #include <Windows.h>
 
+// lib includes
+#include <platform/windows/keylayout.hpp>
+
 // local includes
 #include "misc.h"
 #include "session_input.h"
 #include "src/config.h"
 #include "src/logging.h"
-#include "third-party/libvirtualhid/src/platform/windows/keylayout.hpp"
 
 using namespace std::literals;
 

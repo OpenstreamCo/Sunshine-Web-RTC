@@ -70,6 +70,10 @@ endif()
 # libvirtualhid
 CPMGetPackage(libvirtualhid)
 list(APPEND SUNSHINE_EXTERNAL_LIBRARIES libvirtualhid::libvirtualhid)
+if(WIN32)
+    # session_input.cpp uses libvirtualhid's Windows key layout tables (header-only, not exported)
+    include_directories(SYSTEM "${libvirtualhid_SOURCE_DIR}/src")
+endif()
 list(APPEND PLATFORM_TARGET_FILES
         "${CMAKE_SOURCE_DIR}/src/platform/virtualhid_input.h"
         "${CMAKE_SOURCE_DIR}/src/platform/virtualhid_input.cpp")
