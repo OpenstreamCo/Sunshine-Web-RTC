@@ -233,6 +233,14 @@ const webrtcMediaPorts = computed(() => {
       <div class="form-text">{{ $t('config.packetsize_desc') }}</div>
     </div>
 
+    <!-- DSCP Tagging -->
+    <Checkbox class="mb-3"
+              id="dscp_tagging"
+              locale-prefix="config"
+              v-model="config.dscp_tagging"
+              default="true"
+    ></Checkbox>
+
     <!-- Moonlight WebRTC TV port -->
     <div class="mb-3">
       <label for="webrtc_port" class="form-label">{{ $t('config.webrtc_port') }}</label>
